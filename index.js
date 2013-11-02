@@ -3,6 +3,8 @@
 
 var commander = require('commander')
   , colors = require('colors')
+  , fs = require('fs')
+  , path = require('path')
   , url = require('url')
   , request = require('request')
   , async = require('async')
@@ -25,6 +27,13 @@ commander.version('0.0.1')
 		process.exit(1);
 	}
 });
+
+
+// verify the `dir` exists
+if (!fs.existsSync(path.resolve(commander.dir))) {
+	console.error((commander.dir + " doesn't exist").red);
+	process.exit(1);
+}
 
 
 // resolve the url

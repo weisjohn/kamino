@@ -8,6 +8,7 @@ var commander = require('commander')
   , url = require('url')
   , request = require('request')
   , async = require('async')
+  , mkdirp = require('mkdirp')
   ;
 
 
@@ -84,12 +85,45 @@ async.doWhilst(function(cb) {
 	return refetch;
 }, function() {
 	console.log(("Found " + projects.length + " projects to clone.").green);
-	clone(projects);
+	cloneall(projects);
 });
 
 
-function clone(projects) {
-	console.log("TODO:", "implement this".yellow)
+// clone all the projects
+function cloneall(projects) {
+	async.eachSeries(projects, clone, function(err, results) {
+		if (err) {
+			console.log('Failure while cloning'.red);
+		} else {
+			console.log('Finished');
+		}
+	});
 };
 
+// clone an individual project
+function clone(project, callback) {
+
+	async.waterfall([function(cb) {
+
+		// if the namespace exists, make it there
+		if (project.namespace && project.namespace.path) {
+			var dirpath = path.resolve(commander.dir, project.namespace.path);
+			mkdirp(dirpath, function(err, made) {
+				if (err) return cb('Failed to make directory: ' + dirpath);
+				if (made) console.log(('Made directory: ' + dirpath).green);
+				cb(null);
+			});
+		} else { cb(null); }
+
+	}, function(cb) {
+
+		// clone out the project
+		console.log("TODO", "implement this".yellow);
+		cb(null);
+
+	}], function(err, results) {
+		callback(err, results);
+	});
+
+}
 

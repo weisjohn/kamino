@@ -5,6 +5,7 @@ var commander = require('commander')
   , colors = require('colors')
   , url = require('url')
   , request = require('request')
+  , async = require('async')
   ;
 
 
@@ -59,9 +60,27 @@ function handle(cb) {
 }
 
 
-// find projects
-var projects = [];
-r.get(gitlab.resolve("projects"), handle(function(err, projects) {
-	console.log(projects.length);
-}));
+// find projects (we only get 100 at a time)
+var projects = [], page = 1, refetch;
+async.doWhilst(function(cb) {
+
+	r.get(gitlab.resolve("projects?page=" + page), handle(function(err, p) {
+		page++;
+		refetch = p.length == 100;
+		projects = projects.concat(p);
+		cb();
+	}));
+
+}, function() {
+	return refetch;
+}, function() {
+	console.log(("Found " + projects.length + " projects to clone.").green);
+	clone(projects);
+});
+
+
+function clone(projects) {
+	console.log("TODO:", "implement this".yellow)
+};
+
 

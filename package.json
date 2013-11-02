@@ -1,0 +1,28 @@
+{
+  "name": "kamino",
+  "version": "0.0.0",
+  "description": "a node.js powered cli for cloning lots of repos from Gitlab",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/weisjohn/kamino.git"
+  },
+  "keywords": [
+    "gitlab",
+    "kamino",
+    "git",
+    "clone"
+  ],
+  "author": "John Weis",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/weisjohn/kamino/issues"
+  },
+  "dependencies": {
+    "commander": "~2.0.0",
+    "colors": "~0.6.2"
+  }
+}

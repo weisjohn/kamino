@@ -9,6 +9,7 @@ var commander = require('commander')
   , request = require('request')
   , async = require('async')
   , mkdirp = require('mkdirp')
+  , spawn = require('child_process').spawn
   ;
 
 
@@ -18,6 +19,7 @@ commander.version('0.0.1')
 	.option('-s, --secure', 'Use https instead')
 	.option('-t, --token [token]', 'Your account\'s API token')
 	.option('-d, --dir [dir]', 'The directory to clone projects into')
+	.option('-v, --verbose', 'More logging')
 	.parse(process.argv);
 
 
@@ -71,7 +73,7 @@ function handle(cb) {
 
 
 // find projects (we only get 100 at a time)
-var projects = [], page = 1, refetch;
+var projects = [], page = 1, refetch, successes = 0;
 async.doWhilst(function(cb) {
 
 	r.get(gitlab.resolve("projects?page=" + page), handle(function(err, p) {
@@ -84,7 +86,7 @@ async.doWhilst(function(cb) {
 }, function() {
 	return refetch;
 }, function() {
-	console.log(("Found " + projects.length + " projects to clone.").green);
+	console.log(("Found " + projects.length + " projects possible to clone.").green);
 	cloneall(projects);
 });
 
@@ -95,7 +97,7 @@ function cloneall(projects) {
 		if (err) {
 			console.log('Failure while cloning'.red);
 		} else {
-			console.log('Finished');
+			console.log(("Finished. " + successes + " repo" + (successes !== 1 ? "s" : "") + " successfully cloned").green);
 		}
 	});
 };
@@ -117,13 +119,35 @@ function clone(project, callback) {
 
 	}, function(cb) {
 
-		// clone out the project
-		console.log("TODO", "implement this".yellow);
-		cb(null);
+		// if that exact directory doesn't exist
+		var repo_dir = path.resolve(commander.dir, project.path_with_namespace);
+
+		if (!fs.existsSync(repo_dir)) {
+
+			// find the working directory
+			var namespace_dir = project.namespace ? project.namespace.path : '';
+			var wd = path.resolve(commander.dir, namespace_dir);
+
+			// clone the project, pipe outputs
+			var child = spawn("git", ['clone', project.ssh_url_to_repo ], { cwd : wd });
+			if (commander.verbose) {
+				child.stderr.pipe(process.stderr);
+				child.stdout.pipe(process.stdout);
+			} else {
+				console.log('Cloning', project.name_with_namespace);
+			}
+			child.on('exit', function(code) {
+				if (code == null || code == 0) { successes++; }
+				cb(code);
+			});
+
+		} else {
+			if (commander.verbose) console.warn((repo_dir + ' already exists').yellow);
+			cb(null);
+		}
 
 	}], function(err, results) {
 		callback(err, results);
 	});
 
 }
-

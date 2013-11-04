@@ -2,7 +2,8 @@
   "name": "kamino",
   "version": "0.0.0",
   "description": "a node.js powered cli for cloning lots of repos from Gitlab",
-  "main": "index.js",
+  "main": "./bin/kamino",
+  "bin" : "./bin/kamino",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

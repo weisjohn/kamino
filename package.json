@@ -1,6 +1,6 @@
 {
   "name": "kamino",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "a node.js powered cli for cloning lots of repos from Gitlab",
   "main": "./bin/kamino",
   "bin" : "./bin/kamino",

@@ -11,7 +11,7 @@ This will clone all the repos that you have access to based on the Gitlab API.  
 
 ```
 npm install -g kamino 
-kamino clone --host 192.168.1.1 --token QVy1PB7sTxfy4pqfZM1U --dir ~/mysrc
+kamino --host 192.168.1.1 --token QVy1PB7sTxfy4pqfZM1U --dir ~/mysrc
 ```
 
 Optional flags are: 

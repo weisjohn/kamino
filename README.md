@@ -18,3 +18,14 @@ Optional flags are:
 
  - `-s` for secure access
  - `-v` for verbose logging while cloning
+
+
+# `~/.kaminorc`
+
+You can put your options in a config file. `~/.kaminorc`
+
+```bash
+host=192.168.1.1
+token=pJkyWhDPUXCtnvx6r9cZ
+dir=/Users/me/mysrc
+```

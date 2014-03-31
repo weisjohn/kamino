@@ -20,9 +20,9 @@ Optional flags are:
  - `-v` for verbose logging while cloning
 
 
-# `~/.kaminorc`
+# config
 
-You can put your options in a config file. `~/.kaminorc`
+You can put your options in a config file `~/.kaminorc`
 
 ```bash
 host=192.168.1.1

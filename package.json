@@ -1,9 +1,9 @@
 {
   "name": "kamino",
-  "version": "0.0.1",
-  "description": "a node.js powered cli for cloning lots of repos from Gitlab",
+  "version": "0.1.0",
+  "description": "cli to clone all your repos from Gitlab",
   "main": "./bin/kamino",
-  "bin" : "./bin/kamino",
+  "bin": "./bin/kamino",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -27,6 +27,7 @@
     "colors": "~0.6.2",
     "request": "~2.27.0",
     "async": "~0.2.9",
-    "mkdirp": "~0.3.5"
+    "mkdirp": "~0.3.5",
+    "rc": "^0.3.4"
   }
 }

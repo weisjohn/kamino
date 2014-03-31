@@ -11,11 +11,12 @@ var commander = require('commander')
   , async = require('async')
   , mkdirp = require('mkdirp')
   , spawn = require('child_process').spawn
+  , pkg = require('../package')
   ;
 
 
 // setup
-commander.version('0.0.1')
+commander.version(pkg.version)
     .option('-h, --host [IP || DNS]', 'The IP address or hostname for Gitlab')
     .option('-s, --secure', 'Use https instead')
     .option('-t, --token [token]', 'Your account\'s API token')
@@ -24,9 +25,18 @@ commander.version('0.0.1')
     .parse(process.argv);
 
 
+// unify commander options with config file options
+var config = {
+    host: commander.host,
+    token: commander.token,
+    dir: commander.dir
+};
+require('rc')(pkg.name, config);
+
+
 // validation
 ["host","token","dir"].forEach(function(k) {
-    if (!commander[k]) {
+    if (!config[k]) {
         console.error((k + " is required").red);
         process.exit(1);
     }
@@ -34,15 +44,15 @@ commander.version('0.0.1')
 
 
 // verify the `dir` exists
-if (!fs.existsSync(path.resolve(commander.dir))) {
-    console.error((commander.dir + " doesn't exist").red);
+if (!fs.existsSync(path.resolve(config.dir))) {
+    console.error((config.dir + " doesn't exist").red);
     process.exit(1);
 }
 
 
 // resolve the url
-commander.host = "http" + (commander.secure ? "s" : "") + "://" + commander.host + "/api/v3/";
-var gitlab = url.parse(commander.host);
+config.host = "http" + (config.secure ? "s" : "") + "://" + config.host + "/api/v3/";
+var gitlab = url.parse(config.host);
 if (!gitlab.host) {
     console.error("It appears that `host` is invalid".red);
     process.exit(1);
@@ -51,7 +61,7 @@ if (!gitlab.host) {
 
 // setup request
 var r = request.defaults({ qs : {
-    "private_token" : commander.token,
+    "private_token" : config.token,
     "per_page" : 100
 }, json : true });
 
@@ -108,18 +118,18 @@ function clone(project, callback) {
 
     async.waterfall([mk_namespace_dir(project), function(cb) {
 
-        var repo_dir = path.resolve(commander.dir, project.path_with_namespace);
+        var repo_dir = path.resolve(config.dir, project.path_with_namespace);
 
         // if that directory doesn't exist
         if (!fs.existsSync(repo_dir)) {
 
             // find the working directory
             var namespace_dir = project.namespace ? project.namespace.path : '';
-            var wd = path.resolve(commander.dir, namespace_dir);
+            var wd = path.resolve(config.dir, namespace_dir);
 
             // clone the project, pipe outputs
             var child = spawn("git", ['clone', project.ssh_url_to_repo ], { cwd : wd });
-            if (commander.verbose) {
+            if (config.verbose) {
                 child.stderr.pipe(process.stderr);
                 child.stdout.pipe(process.stdout);
             } else {
@@ -131,7 +141,7 @@ function clone(project, callback) {
             });
 
         } else {
-            if (commander.verbose) console.warn((repo_dir + ' already exists').yellow);
+            if (config.verbose) console.warn((repo_dir + ' already exists').yellow);
             cb(null);
         }
 
@@ -146,7 +156,7 @@ function mk_namespace_dir(project) {
     return function(cb) {
         // if the namespace exists, make it there
         if (project.namespace && project.namespace.path) {
-            var dirpath = path.resolve(commander.dir, project.namespace.path);
+            var dirpath = path.resolve(config.dir, project.namespace.path);
             mkdirp(dirpath, function(err, made) {
                 if (err) return cb('Failed to make directory: ' + dirpath);
                 if (made) console.log(('Made directory: ' + dirpath).green);

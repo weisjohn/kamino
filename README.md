@@ -7,7 +7,7 @@ This will clone all the repos that you have access to based on the Gitlab API.  
 
 > You need to provide your API token to your Gitlab instance. It can be found at http://your_gitlab_ip/profile/account
 
-# usage
+### usage
 
 ```
 npm install -g kamino 
@@ -20,7 +20,7 @@ Optional flags are:
  - `-v` for verbose logging while cloning
 
 
-# config
+### config
 
 You can put your options in a config file `~/.kaminorc`
 

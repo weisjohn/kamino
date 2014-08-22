@@ -1,6 +1,6 @@
 {
   "name": "kamino",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "cli to clone all your repos from Git(Hub/Lab)",
   "main": "./bin/kamino",
   "bin": "./bin/kamino",

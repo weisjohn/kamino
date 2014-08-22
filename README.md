@@ -13,13 +13,15 @@ This will clone all the repos that you have access to based on the Gitlab API.  
 
 ##### github
 
-First, create [a new access token](https://github.com/settings/tokens/new). Store that token (`~/.bash_profile`, `~/.extra`, etc.).
+Create [an access token](https://github.com/settings/tokens/new). Store that token (`~/.bash_profile`, `~/.extra`, etc.).
 
 ```
 kamino --host api.github.com --token ddddc5e7e685ede0548b98d98fef99eb --dir ~/mysrc
 ```
 
 ##### gitlab
+
+Find your access token from (e.g. gitlab.mydomain.com/profile/account).
 
 ```
 kamino --host gitlab.mydomain.com --token QVy1PB7sTxfy4pqfZM1U --dir ~/mysrc

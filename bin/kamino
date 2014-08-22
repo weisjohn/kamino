@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// kamino - a node.js powered cli for cloning lots of repos from Gitlab
+// kamino - a node.js powered cli for cloning lots of repos from Git(Hub/Lab)
 
 var commander = require('commander')
   , colors = require('colors')
@@ -50,20 +50,46 @@ if (!fs.existsSync(path.resolve(config.dir))) {
 }
 
 
+// determine if we're going to *.github.com or somewhere else
+var type = config.host.match(/github\.com/) ? "github" : "gitlab";
+
 // resolve the url
-config.host = "http" + (config.secure ? "s" : "") + "://" + config.host + "/api/v3/";
-var gitlab = url.parse(config.host);
-if (!gitlab.host) {
-    console.error("It appears that `host` is invalid".red);
+if (type == "gitlab") {
+    config.host = "http" + (config.secure ? "s" : "") + "://" + config.host + "/api/v3/";    
+} else {
+    config.host = "https://" + config.host;
+}
+
+var destination = url.parse(config.host);
+if (!destination.host) {
+    console.error(("`host` must be a domain: " + config.host).red);
     process.exit(1);
 }
 
 
-// setup request
-var r = request.defaults({ qs : {
-    "private_token" : config.token,
-    "per_page" : 100
-}, json : true });
+// setup request defaults
+var req;
+if (type == "gitlab") {
+    req = request.defaults({ 
+        qs : {
+            "private_token" : config.token,
+            "per_page" : 100
+        }, 
+        json : true 
+    });
+} else {
+    req = request.defaults({
+        "headers" : {
+            "Accept" : "application/vnd.github.v3+json",
+            "Authorization": "token " + config.token,
+            "User-Agent": pkg.name + "/" + pkg.version + ", " + "node/" + process.version
+        }, 
+        qs: {
+            "per_page" : 100
+        }, 
+        json : true
+    });
+}
 
 
 // error handling
@@ -71,7 +97,7 @@ function handle(cb) {
     return function(err, response, json) {
 
         if (err && err.code === "ENOTFOUND") {
-            console.error('Couldn\'t find Gitlab.'.red);
+            console.error(('Couldn\'t find ' + type + '.').red);
         } else if (response.body && response.body.error) {
             console.error(response.body.error.red);
         } else {
@@ -87,7 +113,14 @@ function handle(cb) {
 var projects = [], page = 1, refetch, successes = 0;
 async.doWhilst(function(cb) {
 
-    r.get(gitlab.resolve("projects?page=" + page), handle(function(err, p) {
+    var url;
+    if (type == "gitlab") {
+        url = destination.resolve("projects?page=" + page)
+    } else {
+        url = destination.resolve('user/repos');
+    }
+
+    req.get(url, handle(function(err, p) {
         page++;
         refetch = p.length == 100;
         projects = projects.concat(p);

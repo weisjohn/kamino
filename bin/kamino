@@ -151,22 +151,29 @@ function clone(project, callback) {
 
     async.waterfall([mk_namespace_dir(project), function(cb) {
 
-        var repo_dir = path.resolve(config.dir, project.path_with_namespace);
+        var project_path = type == "gitlab" ? project.path_with_namespace : project.full_name;
+
+        var repo_dir = path.resolve(config.dir, project_path);
 
         // if that directory doesn't exist
         if (!fs.existsSync(repo_dir)) {
 
             // find the working directory
-            var namespace_dir = project.namespace ? project.namespace.path : '';
+            var namespace_dir;
+            if (type == "gitlab") {
+                namespace_dir = project.namespace ? project.namespace.path : '';  
+            } else {
+                namespace_dir = project.full_name.split('/')[0];
+            }
             var wd = path.resolve(config.dir, namespace_dir);
 
             // clone the project, pipe outputs
-            var child = spawn("git", ['clone', project.ssh_url_to_repo ], { cwd : wd });
+            var child = spawn("git", ['clone', project.ssh_url_to_repo || project.ssh_url ], { cwd : wd });
             if (config.verbose) {
                 child.stderr.pipe(process.stderr);
                 child.stdout.pipe(process.stdout);
             } else {
-                console.log('Cloning', project.name_with_namespace);
+                console.log('Cloning', project.full_name || project.name_with_namespace);
             }
             child.on('exit', function(code) {
                 if (code == null || code == 0) { successes++; }
@@ -187,14 +194,14 @@ function clone(project, callback) {
 
 function mk_namespace_dir(project) {
     return function(cb) {
+        var dir = type == "gitlab" ? project.namespace.path : project.full_name.split("/")[0]
+        if (!dir) return cb("No directory path found for ", project.full_name || project.namespace);
         // if the namespace exists, make it there
-        if (project.namespace && project.namespace.path) {
-            var dirpath = path.resolve(config.dir, project.namespace.path);
-            mkdirp(dirpath, function(err, made) {
-                if (err) return cb('Failed to make directory: ' + dirpath);
-                if (made) console.log(('Made directory: ' + dirpath).green);
-                cb(null);
-            });
-        } else { cb(null); }
+        var dirpath = path.resolve(config.dir, dir);
+        mkdirp(dirpath, function(err, made) {
+            if (err) return cb('Failed to make directory: ' + dirpath);
+            if (made) console.log(('Made directory: ' + dirpath).green);
+            cb(null);
+        });
     }
 }

@@ -3,9 +3,7 @@ kamino
 
 a node.js powered cli for cloning all your repos from Git(Hub/Lab)
 
-This will clone all the repos that you have access to based on the Gitlab API.  All projects inside a namespace will be cloned indo `[dir]/[namespace]/[project]`.
-
-> You need to provide your API token to your Gitlab instance. It can be found at http://your_gitlab_ip/profile/account
+This will clone all the repos that you have access to based on the results from the respective API. Projects are cloned into `[dir]/[namespace]/[project]`.
 
 ### usage
 

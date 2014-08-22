@@ -1,7 +1,7 @@
 kamino
 ======
 
-a node.js powered cli for cloning all your repos from Gitlab
+a node.js powered cli for cloning all your repos from Git(Hub/Lab)
 
 This will clone all the repos that you have access to based on the Gitlab API.  All projects inside a namespace will be cloned indo `[dir]/[namespace]/[project]`.
 
@@ -9,14 +9,25 @@ This will clone all the repos that you have access to based on the Gitlab API.  
 
 ### usage
 
+`npm install -g kamino`
+
+##### github
+
+First, create [a new access token](https://github.com/settings/tokens/new). Store that token (`~/.bash_profile`, `~/.extra`, etc.).
+
 ```
-npm install -g kamino 
-kamino --host 192.168.1.1 --token QVy1PB7sTxfy4pqfZM1U --dir ~/mysrc
+kamino --host api.github.com --token ddddc5e7e685ede0548b98d98fef99eb --dir ~/mysrc
+```
+
+##### gitlab
+
+```
+kamino --host gitlab.mydomain.com --token QVy1PB7sTxfy4pqfZM1U --dir ~/mysrc
 ```
 
 Optional flags are: 
 
- - `-s` for secure access
+ - `-s` for secure access (Gitlab only)
  - `-v` for verbose logging while cloning
 
 

@@ -117,7 +117,7 @@ async.doWhilst(function(cb) {
     if (type == "gitlab") {
         url = destination.resolve("projects?page=" + page)
     } else {
-        url = destination.resolve('user/repos');
+        url = destination.resolve("user/repos?page=" + page);
     }
 
     req.get(url, handle(function(err, p) {
